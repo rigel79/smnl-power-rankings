@@ -35,12 +35,6 @@
     }
     .action-btn svg { fill: white; width: 20px; height: 20px; }
 
-    @media screen and (max-width: 768px) {
-      body { padding-top: 120px !important; padding-bottom: 250px; }
-      #controls { display: none !important; }
-      #btn-open-ui { font-family: 'Archivo Black', sans-serif !important; font-weight: normal !important; }
-    }
-
     #capture-area {
       background-image: url('https://smnl-ticker.vercel.app/bkg/pr_bkg.png');
       background-size: 100% auto; background-position: top center; background-repeat: no-repeat;
@@ -84,15 +78,17 @@
     .arrow-down { color: #ff3333; font-size: 14px; line-height: 1; margin-bottom: 2px; }
     .move-num { color: white; font-family: sans-serif; font-weight: bold; font-size: 19px; line-height: 1; transform: scaleX(1.15); }
 
-    #image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
-    #modal-img { max-width: 90%; max-height: 70vh; border: 2px solid #555; }
     #loading { font-size: 24px; margin-top: 50px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; }
     
-    .btn-close-full {
-      width: 92%; min-height: 100px; margin-top: 60px; background: #ff4444; color: white; border: none;
-      font-family: 'Archivo Black', sans-serif; font-size: 42px; border-radius: 12px; text-transform: uppercase; cursor: pointer;
-    }
+    #image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
+    #modal-img { max-width: 90%; max-height: 70vh; border: 2px solid #555; }
+    .btn-close-full { width: 92%; min-height: 100px; margin-top: 60px; background: #ff4444; color: white; border: none; font-family: 'Archivo Black', sans-serif; font-size: 42px; border-radius: 12px; text-transform: uppercase; cursor: pointer; }
     .modal-instruction { color: #00d4ff; margin-bottom: 40px; font-size: 28px; text-align: center; padding: 0 20px; text-transform: uppercase; }
+
+    @media screen and (max-width: 768px) {
+      body { padding-top: 120px !important; padding-bottom: 250px; }
+      #controls { display: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -145,8 +141,7 @@
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
   <script>
-    // PASTE YOUR GOOGLE APPS SCRIPT URL HERE (ENDING IN /exec)
-    const SCRIPT_URL = "PASTE_YOUR_URL_HERE"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziZXMo19GJx_aIzMX2Tzma96V693m7gqm8aUG0GdDHXha0ugJaYCqYI7tJ2RfC7cx-ZA/exec"; 
 
     function fetchData() {
       const league = document.getElementById('league-select').value;
@@ -154,32 +149,26 @@
       document.getElementById('loading').style.display = 'block';
       document.getElementById('loading').innerText = "FETCHING " + league + " DATA...";
 
-      // Added 'redirect: follow' to handle Google's security redirect chain
       fetch(`${SCRIPT_URL}?league=${league}`, {
         method: 'GET',
         redirect: 'follow'
       })
-      .then(response => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-      })
+      .then(response => response.json())
       .then(data => {
-        // Double check if data is already an object or a string
-        const processedData = typeof data === 'string' ? JSON.parse(data) : data;
-        draw(processedData);
+        const processedData = (typeof data === 'string') ? JSON.parse(data) : data;
+        if (processedData.error) {
+           document.getElementById('loading').innerText = "DB ERROR: " + processedData.error;
+        } else {
+           draw(processedData);
+        }
       })
       .catch(err => {
-        document.getElementById('loading').innerText = "CONNECTION ERROR: CHECK CONSOLE";
-        console.error("SMNL Fetch Error:", err);
+        document.getElementById('loading').innerText = "CONNECTION ERROR: CHECK URL";
+        console.error("SMNL Error:", err);
       });
     }
 
     function draw(response) {
-      if (response.error) {
-        document.getElementById('loading').innerText = "DATABASE ERROR: " + response.error;
-        return;
-      }
-
       document.getElementById('league-logo').src = response.leagueLogo;
       const tag = document.getElementById('league-tag');
       tag.innerHTML = response.difficulty + " LEAGUE";
