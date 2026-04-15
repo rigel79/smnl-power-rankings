@@ -77,7 +77,8 @@
     @media screen and (max-width: 768px) {
       body { padding: 10px 0; display: flex; flex-direction: column; align-items: center; }
       #web-nav { width: 95% !important; flex-direction: column !important; margin: 10px 0 !important; }
-      #league-select { width: 100%; height: 60px; font-size: 24px; margin-bottom: 15px; }
+      #league-select { width: 100%; height: 60px; font-size: 24px; margin-bottom: 15px; order: 2; }
+      #main-logo { order: 1; }
       #main-logo img { height: 70px; margin-bottom: 15px; }
       #controls { display: none !important; }
       #btn-open-ui { display: flex !important; width: 92%; min-height: 70px; font-size: 30px; justify-content: center; margin: 20px auto !important; }
@@ -87,12 +88,12 @@
 <body>
 
   <div id="web-nav">
+    <div id="main-logo"><img src="https://smnl-ticker.vercel.app/logos/smnl_logos/smnl_logo.webp"></div>
     <select id="league-select" onchange="fetchData()">
       <option value="PRO" selected>PRO LEAGUE</option>
       <option value="ALL STAR">ALL STAR LEAGUE</option>
       <option value="LEGENDARY">LEGENDARY LEAGUE</option>
     </select>
-    <div id="main-logo"><img src="https://smnl-ticker.vercel.app/logos/smnl_logos/smnl_logo.webp"></div>
     <div id="controls"><button class="action-btn" onclick="downloadImage()">DOWNLOAD PNG</button></div>
   </div>
   
@@ -118,7 +119,7 @@
   </button>
 
   <div id="image-modal">
-    <div style="color: #00d4ff; margin-bottom: 20px; font-size: 22px;">HOLD IMAGE TO SAVE</div>
+    <div style="color: #00d4ff; margin-bottom: 20px; font-size: 22px; text-align: center; padding: 0 20px;">Press and hold the image below to download</div>
     <img id="modal-img">
     <button class="btn-close-full" onclick="closeModal()">CLOSE</button>
   </div>
@@ -163,7 +164,6 @@
       if (window.innerWidth < 1100) {
         const scale = (window.innerWidth * 0.95) / 1100;
         area.style.transform = `scale(${scale})`;
-        // Esta es la clave: ajustamos la altura del contenedor al tamaño visual del gráfico escalado
         container.style.height = (area.getBoundingClientRect().height) + "px";
       } else {
         area.style.transform = "none";
