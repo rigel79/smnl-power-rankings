@@ -82,12 +82,17 @@
     
     #image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
     #modal-img { max-width: 90%; max-height: 70vh; border: 2px solid #555; }
-    .btn-close-full { width: 92%; min-height: 100px; margin-top: 60px; background: #ff4444; color: white; border: none; font-family: 'Archivo Black', sans-serif; font-size: 42px; border-radius: 12px; text-transform: uppercase; cursor: pointer; }
-    .modal-instruction { color: #00d4ff; margin-bottom: 40px; font-size: 28px; text-align: center; padding: 0 20px; text-transform: uppercase; }
+    .btn-close-full { width: 92%; min-height: 60px; margin-top: 20px; background: #ff4444; color: white; border: none; font-family: 'Archivo Black', sans-serif; font-size: 32px; border-radius: 12px; text-transform: uppercase; cursor: pointer; }
+    .modal-instruction { color: #00d4ff; margin-bottom: 20px; font-size: 22px; text-align: center; padding: 0 20px; text-transform: uppercase; }
 
     @media screen and (max-width: 768px) {
-      body { padding-top: 120px !important; padding-bottom: 250px; }
+      body { padding-top: 30px !important; padding-bottom: 50px; }
       #controls { display: none !important; }
+      #btn-open-ui { min-height: 60px !important; font-size: 32px !important; margin: 15px auto !important; }
+      #league-select { height: 60px !important; font-size: 28px !important; }
+      #main-logo img { height: 70px !important; }
+      #web-nav { margin: 10px 0 20px 0 !important; }
+      #main-logo { padding-bottom: 15px !important; }
     }
   </style>
 </head>
@@ -128,7 +133,7 @@
   </div>
 
   <button id="btn-open-ui" class="action-btn" onclick="openImage()" style="display: none; width: 92%; min-height: 100px; margin: 30px auto; font-size: 42px; justify-content: center;">
-    <svg viewBox="0 0 24 24" style="width: 40px; height: 40px;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+    <svg viewBox="0 0 24 24" style="width: 32px; height: 32px;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
     OPEN PNG
   </button>
 
@@ -141,6 +146,7 @@
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
   <script>
+    // LÍNEA 144: PEGA TU URL AQUÍ
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziZXMo19GJx_aIzMX2Tzma96V693m7gqm8aUG0GdDHXha0ugJaYCqYI7tJ2RfC7cx-ZA/exec"; 
 
     function fetchData() {
@@ -208,14 +214,12 @@
         const nav = document.getElementById('web-nav');
         const selector = document.getElementById('league-select');
         const mainLogoContainer = document.getElementById('main-logo');
-        nav.style.width = '100vw'; nav.style.flexDirection = 'column'; nav.style.margin = '60px 0 80px 0';
+        nav.style.width = '100vw'; nav.style.flexDirection = 'column'; 
         const controls = document.getElementById('controls'); if (controls) controls.remove();
         if (mainLogoContainer) {
-          mainLogoContainer.style.paddingBottom = '50px'; nav.prepend(mainLogoContainer); 
-          mainLogoContainer.querySelector('img').style.height = '100px';
+          nav.prepend(mainLogoContainer); 
         }
-        selector.style.width = '92%'; selector.style.height = '100px'; selector.style.fontSize = '42px';
-        selector.style.borderRadius = '12px'; selector.style.border = '2px solid #ffffff'; 
+        selector.style.width = '92%'; 
         document.getElementById('btn-open-ui').style.display = 'flex';
       }
     }
@@ -225,7 +229,7 @@
       if (window.innerWidth < 1100) {
         const scale = window.innerWidth / 1100;
         area.style.transform = `scale(${scale})`;
-        document.body.style.height = (area.offsetHeight * scale + 400) + "px";
+        document.body.style.height = (area.offsetHeight * scale + 250) + "px";
       } else { area.style.transform = "none"; document.body.style.height = "auto"; }
     }
 
