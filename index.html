@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base target="\_top">
+  <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SMNL Power Rankings</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');
- 
+    
     body {
-      margin: 0; padding: 0;
+      margin: 0; padding: 0; 
       background: radial-gradient(circle at center, #0f172a 0%, #030712 100%);
-      color: white; font-family: 'Archivo Black', sans-serif;
-      display: flex; flex-direction: column; align-items: center;
+      color: white; font-family: 'Archivo Black', sans-serif; 
+      display: flex; flex-direction: column; align-items: center; 
       min-height: 100vh; overflow-x: hidden;
     }
 
     #web-nav { width: 1100px; margin: 20px auto; display: flex; justify-content: space-between; align-items: center; }
     #main-logo { display: flex; justify-content: center; align-items: center; flex-grow: 1; text-align: center; }
     #main-logo img { height: 100px; width: auto; filter: drop-shadow(0px 4px 12px rgba(0,0,0,0.8)); }
- 
+    
     #league-select {
       background: #1e293b; color: white; border: 1.5px solid #ffffff;
       padding: 12px; font-size: 16px; text-transform: uppercase; border-radius: 8px;
@@ -28,9 +28,9 @@
 
     .action-btn {
       color: white; border: 1px solid #334155; padding: 12px 20px;
-      font-family: sans-serif; font-weight: 500; text-transform: uppercase;
-      border-radius: 8px; cursor: pointer; display: flex; align-items: center;
-      gap: 10px; background: #27aae1; font-size: 15px; height: 46px;
+      font-family: sans-serif; font-weight: 500; text-transform: uppercase; 
+      border-radius: 8px; cursor: pointer; display: flex; align-items: center; 
+      gap: 10px; background: #27aae1; font-size: 15px; height: 46px; 
       box-sizing: border-box; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
     }
     .action-btn svg { fill: white; width: 20px; height: 20px; }
@@ -66,12 +66,12 @@
     .team-row { display: flex; align-items: center; height: 55px; }
     .rank-box { background-color: white; width: 55px; height: 100%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .rank-num { font-size: 32px; color: black; transform: scaleX(1.1); margin: 0; }
- 
+    
     .team-bar { height: 100%; width: 380px; display: flex; align-items: center; position: relative; overflow: hidden; margin-left: 5px; }
     .team-info { padding: 0 15px; display: flex; flex-direction: column; justify-content: center; line-height: 0.8; flex-grow: 1; }
     .name-top { font-size: 13px; text-transform: uppercase; color: white; font-weight: 900; }
     .name-main { font-size: 26px; text-transform: uppercase; color: white; transform: scaleX(1.2); transform-origin: left; font-weight: 900; white-space: nowrap; }
- 
+    
     .logo-area { width: 75px; height: 100%; background-color: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; transform: skewX(-15deg); margin-right: -10px; border-left: 2px solid rgba(255,255,255,0.1); flex-shrink: 0; }
     .team-logo { height: 42px; width: 42px; transform: skewX(15deg); object-fit: contain; }
 
@@ -87,7 +87,7 @@
     #image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
     #modal-img { max-width: 90%; max-height: 70vh; border: 2px solid #555; }
     #loading { font-size: 24px; margin-top: 50px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; }
- 
+    
     .btn-close-full {
       width: 92%; min-height: 100px; margin-top: 60px; background: #ff4444; color: white; border: none;
       font-family: 'Archivo Black', sans-serif; font-size: 42px; border-radius: 12px; text-transform: uppercase; cursor: pointer;
@@ -103,9 +103,9 @@
       <option value="ALL STAR">ALL STAR LEAGUE</option>
       <option value="LEGENDARY">LEGENDARY LEAGUE</option>
     </select>
- 
+    
     <div id="main-logo">
-      <img src="https://smnl-ticker.vercel.app/logos/smnl\_logos/smnl\_logo.webp" alt="SMNL Official Logo">
+      <img src="https://smnl-ticker.vercel.app/logos/smnl_logos/smnl_logo.webp" alt="SMNL Official Logo">
     </div>
 
     <div id="controls">
@@ -115,7 +115,7 @@
       </button>
     </div>
   </div>
- 
+  
   <div id="loading">CONNECTING TO SMNL DATABASE...</div>
 
   <div id="capture-area" style="display: none;">
@@ -128,7 +128,7 @@
       </div>
       <div class="league-logo-container"><img id="league-logo" src="" alt="League Logo" crossorigin="anonymous"></div>
     </div>
-    <div class="ranking-container" id="content"></div>
+    <div class="ranking-container" id="content-grid"></div>
   </div>
 
   <button id="btn-open-ui" class="action-btn" onclick="openImage()" style="display: none; width: 92%; min-height: 100px; margin: 30px auto; font-size: 42px; justify-content: center;">
@@ -145,8 +145,8 @@
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
   <script>
-    // PASTE YOUR GOOGLE APPS SCRIPT URL HERE
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziZXMo19GJx_aIzMX2Tzma96V693m7gqm8aUG0GdDHXha0ugJaYCqYI7tJ2RfC7cx-ZA/exec";
+    // PASTE YOUR GOOGLE APPS SCRIPT URL HERE (ENDING IN /exec)
+    const SCRIPT_URL = "PASTE_YOUR_URL_HERE"; 
 
     function fetchData() {
       const league = document.getElementById('league-select').value;
@@ -154,27 +154,43 @@
       document.getElementById('loading').style.display = 'block';
       document.getElementById('loading').innerText = "FETCHING " + league + " DATA...";
 
-      fetch(`${SCRIPT\_URL}?league=${league}`)
-        .then(response => response.json())
-        .then(data => draw(data))
-        .catch(err => {
-          document.getElementById('loading').innerText = "CONNECTION ERROR";
-          console.error(err);
-        });
+      // Added 'redirect: follow' to handle Google's security redirect chain
+      fetch(`${SCRIPT_URL}?league=${league}`, {
+        method: 'GET',
+        redirect: 'follow'
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(data => {
+        // Double check if data is already an object or a string
+        const processedData = typeof data === 'string' ? JSON.parse(data) : data;
+        draw(processedData);
+      })
+      .catch(err => {
+        document.getElementById('loading').innerText = "CONNECTION ERROR: CHECK CONSOLE";
+        console.error("SMNL Fetch Error:", err);
+      });
     }
 
     function draw(response) {
+      if (response.error) {
+        document.getElementById('loading').innerText = "DATABASE ERROR: " + response.error;
+        return;
+      }
+
       document.getElementById('league-logo').src = response.leagueLogo;
       const tag = document.getElementById('league-tag');
       tag.innerHTML = response.difficulty + " LEAGUE";
       tag.style.color = (response.difficulty === "PRO") ? "#ADFF2F" : (response.difficulty === "LEGENDARY") ? "#FF8C00" : "#a333c8";
       document.getElementById('season-tag').innerHTML = " | " + response.seasonWeek;
 
-      const content = document.getElementById('content');
+      const grid = document.getElementById('content-grid');
       const rowsNeeded = Math.ceil(response.rankingData.length / 2);
-      content.style.setProperty('--total-rows', rowsNeeded);
+      grid.style.setProperty('--total-rows', rowsNeeded);
 
-      content.innerHTML = response.rankingData.map(t => {
+      grid.innerHTML = response.rankingData.map(t => {
         let moveHtml = `<div class="move-wrapper"><span class="${t.movement > 0 ? 'arrow-up' : (t.movement < 0 ? 'arrow-down' : '')}">${t.movement > 0 ? '▲' : (t.movement < 0 ? '▼' : '')}</span><span class="move-num">${Math.abs(t.movement)}</span></div>`;
         return `
           <div class="team-row">
@@ -206,11 +222,11 @@
         nav.style.width = '100vw'; nav.style.flexDirection = 'column'; nav.style.margin = '60px 0 80px 0';
         const controls = document.getElementById('controls'); if (controls) controls.remove();
         if (mainLogoContainer) {
-          mainLogoContainer.style.paddingBottom = '50px'; nav.prepend(mainLogoContainer);
+          mainLogoContainer.style.paddingBottom = '50px'; nav.prepend(mainLogoContainer); 
           mainLogoContainer.querySelector('img').style.height = '100px';
         }
         selector.style.width = '92%'; selector.style.height = '100px'; selector.style.fontSize = '42px';
-        selector.style.borderRadius = '12px'; selector.style.border = '2px solid #ffffff';
+        selector.style.borderRadius = '12px'; selector.style.border = '2px solid #ffffff'; 
         document.getElementById('btn-open-ui').style.display = 'flex';
       }
     }
@@ -232,6 +248,7 @@
         captureArea.style.transform = originalTransform;
         document.getElementById('modal-img').src = canvas.toDataURL("image/png");
         document.getElementById('image-modal').style.display = 'flex';
+        adjustScale();
       });
     }
 
