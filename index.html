@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="\_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SMNL Power Rankings</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');
+ 
+    body {
+      margin: 0; padding: 0;
+      background: radial-gradient(circle at center, #0f172a 0%, #030712 100%);
+      color: white; font-family: 'Archivo Black', sans-serif;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh; overflow-x: hidden;
+    }
+
+    #web-nav { width: 1100px; margin: 20px auto; display: flex; justify-content: space-between; align-items: center; }
+    #main-logo { display: flex; justify-content: center; align-items: center; flex-grow: 1; text-align: center; }
+    #main-logo img { height: 100px; width: auto; filter: drop-shadow(0px 4px 12px rgba(0,0,0,0.8)); }
+ 
+    #league-select {
+      background: #1e293b; color: white; border: 1.5px solid #ffffff;
+      padding: 12px; font-size: 16px; text-transform: uppercase; border-radius: 8px;
+      height: 46px; box-sizing: border-box; font-family: sans-serif;
+    }
+
+    .action-btn {
+      color: white; border: 1px solid #334155; padding: 12px 20px;
+      font-family: sans-serif; font-weight: 500; text-transform: uppercase;
+      border-radius: 8px; cursor: pointer; display: flex; align-items: center;
+      gap: 10px; background: #27aae1; font-size: 15px; height: 46px;
+      box-sizing: border-box; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    .action-btn svg { fill: white; width: 20px; height: 20px; }
+
+    @media screen and (max-width: 768px) {
+      body { padding-top: 120px !important; padding-bottom: 250px; }
+      #controls { display: none !important; }
+      #btn-open-ui { font-family: 'Archivo Black', sans-serif !important; font-weight: normal !important; }
+    }
+
+    #capture-area {
+      background-image: url('https://smnl-ticker.vercel.app/bkg/pr_bkg.png');
+      background-size: 100% auto; background-position: top center; background-repeat: no-repeat;
+      background-color: #0a0a0a; padding: 60px 35px 40px 35px; width: 1100px;
+      display: flex; flex-direction: column; align-items: center;
+      transform-origin: top center; box-sizing: border-box;
+      box-shadow: 0px 20px 50px rgba(0,0,0,0.9); border-radius: 4px;
+    }
+
+    #header { width: 100%; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .logo-container { display: flex; flex-direction: column; line-height: 0.85; }
+    .league-title-wrapper { font-size: 22px; text-transform: uppercase; margin-bottom: 6px; transform: scaleX(1.3); transform-origin: left; }
+    .logo-power, .logo-rankings { text-transform: uppercase; margin: 0; transform: scaleX(1.3); transform-origin: left; font-size: 50px; }
+    .logo-power { color: #27aae1; }
+    .logo-underline { width: 400px; height: 12px; background-color: white; margin-top: 12px; }
+    #league-logo { height: 170px; width: auto; filter: drop-shadow(0px 8px 15px rgba(0,0,0,0.8)); }
+
+    .ranking-container {
+      display: grid; grid-template-rows: repeat(var(--total-rows, 10), 1fr);
+      grid-template-columns: 1fr 1fr; grid-auto-flow: column; gap: 12px 50px; width: 100%;
+    }
+
+    .team-row { display: flex; align-items: center; height: 55px; }
+    .rank-box { background-color: white; width: 55px; height: 100%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .rank-num { font-size: 32px; color: black; transform: scaleX(1.1); margin: 0; }
+ 
+    .team-bar { height: 100%; width: 380px; display: flex; align-items: center; position: relative; overflow: hidden; margin-left: 5px; }
+    .team-info { padding: 0 15px; display: flex; flex-direction: column; justify-content: center; line-height: 0.8; flex-grow: 1; }
+    .name-top { font-size: 13px; text-transform: uppercase; color: white; font-weight: 900; }
+    .name-main { font-size: 26px; text-transform: uppercase; color: white; transform: scaleX(1.2); transform-origin: left; font-weight: 900; white-space: nowrap; }
+ 
+    .logo-area { width: 75px; height: 100%; background-color: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; transform: skewX(-15deg); margin-right: -10px; border-left: 2px solid rgba(255,255,255,0.1); flex-shrink: 0; }
+    .team-logo { height: 42px; width: 42px; transform: skewX(15deg); object-fit: contain; }
+
+    .move-wrapper {
+      width: 45px; height: 100%; background-color: #666666;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin-left: 5px; flex-shrink: 0; border-radius: 0 4px 4px 0; border: 1px solid #777;
+    }
+    .arrow-up { color: #00ff44; font-size: 14px; line-height: 1; margin-bottom: 2px; }
+    .arrow-down { color: #ff3333; font-size: 14px; line-height: 1; margin-bottom: 2px; }
+    .move-num { color: white; font-family: sans-serif; font-weight: bold; font-size: 19px; line-height: 1; transform: scaleX(1.15); }
+
+    #image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
+    #modal-img { max-width: 90%; max-height: 70vh; border: 2px solid #555; }
+    #loading { font-size: 24px; margin-top: 50px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; }
+ 
+    .btn-close-full {
+      width: 92%; min-height: 100px; margin-top: 60px; background: #ff4444; color: white; border: none;
+      font-family: 'Archivo Black', sans-serif; font-size: 42px; border-radius: 12px; text-transform: uppercase; cursor: pointer;
+    }
+    .modal-instruction { color: #00d4ff; margin-bottom: 40px; font-size: 28px; text-align: center; padding: 0 20px; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+
+  <div id="web-nav">
+    <select id="league-select" onchange="fetchData()">
+      <option value="PRO" selected>PRO LEAGUE</option>
+      <option value="ALL STAR">ALL STAR LEAGUE</option>
+      <option value="LEGENDARY">LEGENDARY LEAGUE</option>
+    </select>
+ 
+    <div id="main-logo">
+      <img src="https://smnl-ticker.vercel.app/logos/smnl\_logos/smnl\_logo.webp" alt="SMNL Official Logo">
+    </div>
+
+    <div id="controls">
+      <button class="action-btn" onclick="downloadImage()">
+        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        DOWNLOAD PNG
+      </button>
+    </div>
+  </div>
+ 
+  <div id="loading">CONNECTING TO SMNL DATABASE...</div>
+
+  <div id="capture-area" style="display: none;">
+    <div id="header">
+      <div class="logo-container">
+        <div class="league-title-wrapper"><span id="league-tag"></span><span id="season-tag"></span></div>
+        <h1 class="logo-power">POWER</h1>
+        <h1 class="logo-rankings">RANKINGS</h1>
+        <div class="logo-underline"></div>
+      </div>
+      <div class="league-logo-container"><img id="league-logo" src="" alt="League Logo" crossorigin="anonymous"></div>
+    </div>
+    <div class="ranking-container" id="content"></div>
+  </div>
+
+  <button id="btn-open-ui" class="action-btn" onclick="openImage()" style="display: none; width: 92%; min-height: 100px; margin: 30px auto; font-size: 42px; justify-content: center;">
+    <svg viewBox="0 0 24 24" style="width: 40px; height: 40px;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+    OPEN PNG
+  </button>
+
+  <div id="image-modal">
+    <div class="modal-instruction">Press and hold the image to download</div>
+    <img id="modal-img" src="">
+    <button class="btn-close-full" onclick="closeModal()">CLOSE</button>
+  </div>
+
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+  <script>
+    // PASTE YOUR GOOGLE APPS SCRIPT URL HERE
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziZXMo19GJx_aIzMX2Tzma96V693m7gqm8aUG0GdDHXha0ugJaYCqYI7tJ2RfC7cx-ZA/exec";
+
+    function fetchData() {
+      const league = document.getElementById('league-select').value;
+      document.getElementById('capture-area').style.display = 'none';
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('loading').innerText = "FETCHING " + league + " DATA...";
+
+      fetch(`${SCRIPT\_URL}?league=${league}`)
+        .then(response => response.json())
+        .then(data => draw(data))
+        .catch(err => {
+          document.getElementById('loading').innerText = "CONNECTION ERROR";
+          console.error(err);
+        });
+    }
+
+    function draw(response) {
+      document.getElementById('league-logo').src = response.leagueLogo;
+      const tag = document.getElementById('league-tag');
+      tag.innerHTML = response.difficulty + " LEAGUE";
+      tag.style.color = (response.difficulty === "PRO") ? "#ADFF2F" : (response.difficulty === "LEGENDARY") ? "#FF8C00" : "#a333c8";
+      document.getElementById('season-tag').innerHTML = " | " + response.seasonWeek;
+
+      const content = document.getElementById('content');
+      const rowsNeeded = Math.ceil(response.rankingData.length / 2);
+      content.style.setProperty('--total-rows', rowsNeeded);
+
+      content.innerHTML = response.rankingData.map(t => {
+        let moveHtml = `<div class="move-wrapper"><span class="${t.movement > 0 ? 'arrow-up' : (t.movement < 0 ? 'arrow-down' : '')}">${t.movement > 0 ? '▲' : (t.movement < 0 ? '▼' : '')}</span><span class="move-num">${Math.abs(t.movement)}</span></div>`;
+        return `
+          <div class="team-row">
+            <div class="rank-box"><p class="rank-num">${t.rank}</p></div>
+            <div class="team-bar" style="background-color: ${t.color};">
+              <div class="team-info">
+                <div class="name-top">${t.nameLine1}</div>
+                <div class="name-main">${t.nameLine2}</div>
+              </div>
+              <div class="logo-area">
+                <img src="${t.logo}" class="team-logo" crossorigin="anonymous" onerror="this.style.opacity='0'">
+              </div>
+            </div>
+            ${moveHtml}
+          </div>`;
+      }).join('');
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('capture-area').style.display = 'flex';
+      setTimeout(adjustScale, 150);
+    }
+
+    function setupMobileUI() {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+      if (isMobile) {
+        const nav = document.getElementById('web-nav');
+        const selector = document.getElementById('league-select');
+        const mainLogoContainer = document.getElementById('main-logo');
+        nav.style.width = '100vw'; nav.style.flexDirection = 'column'; nav.style.margin = '60px 0 80px 0';
+        const controls = document.getElementById('controls'); if (controls) controls.remove();
+        if (mainLogoContainer) {
+          mainLogoContainer.style.paddingBottom = '50px'; nav.prepend(mainLogoContainer);
+          mainLogoContainer.querySelector('img').style.height = '100px';
+        }
+        selector.style.width = '92%'; selector.style.height = '100px'; selector.style.fontSize = '42px';
+        selector.style.borderRadius = '12px'; selector.style.border = '2px solid #ffffff';
+        document.getElementById('btn-open-ui').style.display = 'flex';
+      }
+    }
+
+    function adjustScale() {
+      const area = document.getElementById('capture-area');
+      if (window.innerWidth < 1100) {
+        const scale = window.innerWidth / 1100;
+        area.style.transform = `scale(${scale})`;
+        document.body.style.height = (area.offsetHeight * scale + 400) + "px";
+      } else { area.style.transform = "none"; document.body.style.height = "auto"; }
+    }
+
+    function openImage() {
+      const captureArea = document.getElementById('capture-area');
+      const originalTransform = captureArea.style.transform;
+      captureArea.style.transform = "none";
+      html2canvas(captureArea, { useCORS: true, scale: 2 }).then(canvas => {
+        captureArea.style.transform = originalTransform;
+        document.getElementById('modal-img').src = canvas.toDataURL("image/png");
+        document.getElementById('image-modal').style.display = 'flex';
+      });
+    }
+
+    function closeModal() { document.getElementById('image-modal').style.display = 'none'; }
+
+    function downloadImage() {
+      const captureArea = document.getElementById('capture-area');
+      const league = document.getElementById('league-select').value;
+      const originalTransform = captureArea.style.transform;
+      captureArea.style.transform = "none";
+      html2canvas(captureArea, { useCORS: true, scale: 2 }).then(canvas => {
+        captureArea.style.transform = originalTransform;
+        const link = document.createElement('a');
+        link.download = league.toLowerCase().replace(" ", "_") + "_pr.png";
+        link.href = canvas.toDataURL("image/png"); link.click();
+      });
+    }
+
+    window.onload = () => { setupMobileUI(); fetchData(); };
+    window.onresize = adjustScale;
+  </script>
+</body>
+</html>
