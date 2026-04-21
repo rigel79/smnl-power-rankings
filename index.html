@@ -28,13 +28,17 @@
     #main-logo { display: flex; justify-content: flex-start; align-items: center; }
     #main-logo img { height: 100px; width: auto; filter: drop-shadow(0px 4px 12px rgba(0,0,0,0.8)); }
     
-    #controls-wrapper { display: flex; align-items: center; gap: 25px; }
+    /* Contenedor de controles actualizado para dos selectores */
+    #controls-wrapper { display: flex; align-items: center; gap: 15px; }
 
-    #league-select {
+    #league-select, #week-select {
       background: #1e293b; color: white; border: 1.5px solid #ffffff;
       padding: 0 12px; font-size: 16px; text-transform: uppercase; border-radius: 8px;
       height: 46px; box-sizing: border-box; font-family: sans-serif; cursor: pointer;
     }
+
+    /* Ancho específico para el selector de semana en Desktop */
+    #week-select { width: 140px; }
 
     .action-btn {
       color: white; border: 1px solid #334155; padding: 12px 20px;
@@ -86,29 +90,39 @@
     #modal-img { max-width: 90%; max-height: 70vh; border: 2px solid #555; }
     .btn-close-full { width: 92%; min-height: 60px; margin-top: 20px; background: #ff4444; color: white; border: none; font-family: 'Archivo Black', sans-serif; font-size: 32px; border-radius: 12px; text-transform: uppercase; }
 
-    /* MOBILE */
+    /* MOBILE (Basado en tu captura de WhatsApp) */
     @media screen and (max-width: 768px) {
       body { padding: 10px 0; }
       #web-nav { width: 95% !important; flex-direction: column !important; margin: 10px 0 !important; }
       #controls-wrapper { flex-direction: column; width: 100%; gap: 0; order: 2; }
-      #league-select { width: 100%; height: 60px; font-size: 24px; margin-bottom: 15px; }
+      
+      /* Selectores apilados y anchos en móvil */
+      #league-select, #week-select { width: 100%; height: 60px; font-size: 24px; margin-bottom: 12px; }
+      
       #main-logo { order: 1; justify-content: center !important; width: 100%; }
       #main-logo img { height: 70px; margin-bottom: 15px; }
       #btn-download-desktop { display: none !important; }
-      #btn-open-ui { display: flex !important; width: 92%; min-height: 70px; font-size: 30px; justify-content: center; margin: 20px auto !important; }
+      #btn-open-ui { display: flex !important; width: 92%; min-height: 75px; font-size: 30px; justify-content: center; margin: 20px auto !important; }
     }
   </style>
 </head>
 <body>
 
   <div id="web-nav">
-    <div id="main-logo"><img src="https://smnl-ticker.vercel.app/logos/smnl_logos/smnl_logo.webp"></div>
+    <div id="main-logo">
+      <img src="https://smnl-ticker.vercel.app/logos/smnl_logos/smnl_logo.webp">
+    </div>
     <div id="controls-wrapper">
+      <select id="week-select" onchange="fetchData()">
+        <option value="1">WEEK 1</option>
+      </select>
+
       <select id="league-select" onchange="fetchData()">
         <option value="PRO" selected>PRO LEAGUE</option>
         <option value="ALL STAR">ALL STAR LEAGUE</option>
         <option value="LEGENDARY">LEGENDARY LEAGUE</option>
       </select>
+      
       <button id="btn-download-desktop" class="action-btn" onclick="downloadDirect()">DOWNLOAD PNG</button>
     </div>
   </div>
@@ -142,19 +156,49 @@
 
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script>
+    // RECUERDA: Cambia esta URL por la de tu nuevo "Deployment" de Apps Script
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziZXMo19GJx_aIzMX2Tzma96V693m7gqm8aUG0GdDHXha0ugJaYCqYI7tJ2RfC7cx-ZA/exec"; 
+    let weeksInitialized = false;
 
     function fetchData() {
       const league = document.getElementById('league-select').value;
+      const week = document.getElementById('week-select').value;
+      
       document.getElementById('capture-area').style.display = 'none';
       document.getElementById('loading').style.display = 'block';
-      fetch(`${SCRIPT_URL}?league=${league}`).then(r => r.json()).then(data => draw(data));
+      
+      // Enviamos ambos parámetros al backend
+      fetch(`${SCRIPT_URL}?league=${league}&week=${week}`)
+        .then(r => r.json())
+        .then(data => {
+          // Genera el dropdown de semanas basándose en el I2 de tu Sheet
+          if (!weeksInitialized) {
+            updateWeekSelector(data.totalWeeks);
+          }
+          draw(data);
+        });
+    }
+
+    function updateWeekSelector(total) {
+      const select = document.getElementById('week-select');
+      const currentVal = select.value;
+      select.innerHTML = "";
+      for(let i = 1; i <= total; i++) {
+        let opt = document.createElement('option');
+        opt.value = i;
+        opt.innerText = `WEEK ${i}`;
+        select.appendChild(opt);
+      }
+      select.value = currentVal;
+      weeksInitialized = true;
     }
 
     function draw(response) {
       document.getElementById('league-logo').src = response.leagueLogo;
       document.getElementById('league-tag').innerText = response.difficulty + " LEAGUE";
+      // Ahora usamos el texto dinámico que viene del backend (ej: S10 - WEEK 3)
       document.getElementById('season-tag').innerText = " | " + response.seasonWeek;
+      
       const grid = document.getElementById('content-grid');
       grid.style.setProperty('--total-rows', Math.ceil(response.rankingData.length / 2));
       
@@ -191,7 +235,6 @@
       }
     }
 
-    // DESKTOP: Descarga directa al PC
     function downloadDirect() {
       const area = document.getElementById('capture-area');
       const oldTrans = area.style.transform;
@@ -199,13 +242,12 @@
       html2canvas(area, { useCORS: true, scale: 2 }).then(canvas => {
         area.style.transform = oldTrans;
         const link = document.createElement('a');
-        link.download = `SMNL-Power-Rankings-${document.getElementById('league-select').value}.png`;
+        link.download = `SMNL-PR-${document.getElementById('league-select').value}-W${document.getElementById('week-select').value}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
       });
     }
 
-    // MÓVIL: Abre modal para salvar manualmente
     function openImage() {
       const area = document.getElementById('capture-area');
       const oldTrans = area.style.transform;
@@ -218,6 +260,7 @@
     }
 
     function closeModal() { document.getElementById('image-modal').style.display = 'none'; }
+    
     window.onload = fetchData;
     window.onresize = adjustScale;
   </script>
